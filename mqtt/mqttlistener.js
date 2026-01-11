@@ -1,8 +1,8 @@
 const mqtt = require('mqtt')
 const devices = require('../models/deviceModel')
 const metrics = require('../models/metricsModel')
-
-const brokerURL = "mqtt://broker.emqx.io:1883"
+const alerts = require('../models/alertsModel')
+const brokerURL = process.env.BROKER_URL
 
 const client = mqtt.connect(brokerURL)
 
@@ -32,36 +32,104 @@ client.on('message',async(topic,message)=>{
         await device.save()
 
        await metrics.create({
-        deviceID: data.deviceID,
+        device: device._id,
         temperature: data.temperature,
         humidity: data.humidity,
-        timestamp: data.timestamp?new Date(data.timestamp):new Date
+        battery: data.battery,
+        timestamp: data.timestamp?new Date(data.timestamp):new Date()
        })
 
-       setInterval(async ()=>{
-        const threshold = 20000
+       if (data.battery < 10) {
+        
+        const existingAlert = await alerts.findOne({
+            device: device._id,
+            type: "LOW_BATTERY",
+            message: `Battery low (${data.battery}%)`,
+            status: "active"
+        })
+        if (!existingAlert) {
+         await alerts.create({
+            device: device._id,
+            type: "LOW_BATTERY",
+            message: `Battery low (${data.battery}%)`,
+            severity: "high"
+         })
+       }
+       }
 
-        const allDevices = await devices.find()
+       if (data.temperature > 70) {
+        const existingAlert = await alerts.findOne({
+            device: device._id,
+            type: "HIGH_TEMP",
+            message: `High temperature detected ${data.temperature}`,
+            status: "active"
+        })
+        if (!existingAlert) {
+         await alerts.create({
+            device: device._id,
+            type: "HIGH_TEMP",
+            message: `High temperature detected ${data.temperature}`,
+            severity: "high"
+         })
+       }
+       }
 
-        const now = Date.now()
-
-        for(let d of allDevices){
-            if (!d.lastSeen) {
-                continue
-            }
-            const diff = now - new Date(d.lastSeen).getTime() 
-            if (diff > threshold && d.status != "offline") {
-                d.status = "offline"
-                await d.save()
-                console.log(`Device ${d.deviceID} is offline`);
-            }
-        }
-
-       },10000)
+       if (data.humidity < 20) {
+        const existingAlert = await alerts.findOne({
+            device: device._id,
+            type: "LOW_HUM",
+            message: `Low humidity detected ${data.humidity}%`,
+            status: "active"
+        })
+        if (!existingAlert) {
+         await alerts.create({
+            device: device._id,
+            type: "LOW_HUM",
+            message: `Low humidity detected ${data.humidity}%`,
+            severity: "med"
+         })
+       }
+       }
     }
     }catch(err){
       console.log(err);
     }
 })
+       setInterval(async ()=>{
+            const threshold = 20000
+
+            const allDevices = await devices.find()
+
+            const now = Date.now()
+
+            for(let d of allDevices){
+                if (!d.lastSeen) {
+                    continue
+                }
+                const diff = now - new Date(d.lastSeen).getTime() 
+                if (diff > threshold && d.status != "offline") {
+                    d.status = "offline"
+                    await d.save()
+
+                    const existingAlert = await alerts.findOne({
+                        device: d._id,
+                        type: "DISCONNECTED",
+                        status: 'active'
+                    })
+
+                    if (!existingAlert) {
+                        await alerts.create({
+                            device: d._id,
+                            type: "DISCONNECTED",
+                            message: "Device stopped sending data",
+                            severity: "high"
+                        })
+                    }
+
+                    console.log(`Device ${d.deviceID} is offline`);
+                }
+            }
+
+       },10000)
 
 

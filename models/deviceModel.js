@@ -16,8 +16,8 @@ const deviceSchema = mongoose.Schema({
     },
     type:{
         type:String,
-        enum:["temperature","humidity","battery"],
-        default:"temparature"
+        enum:["temp_hum"],
+        default:"temp_hum"
     },
     location:{
         type:String,
