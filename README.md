@@ -24,5 +24,5 @@ MongoDB & Mongoose,
 MQTT (HiveMQ / EMQX),
 JWT Authentication
 
-🌐 Deployment
-https://iot-backend-2hr9.onrender.com/
+🌐 Deployment: 
+https://iot-backend-2hr9.onrender.com
