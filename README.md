@@ -9,11 +9,11 @@ It also exposes REST APIs for frontend dashboards with role-based access control
 
 🧩 Features
 
-📡 MQTT-based real-time data ingestion
-🔐 Secure device authentication using deviceID & secretKey
-🗄️ Sensor metrics storage with MongoDB
-🚨 Automated alert generation (battery, temperature, humidity, offline)
-🧑‍💼 Role-based access control using JWT
+📡 MQTT-based real-time data ingestion,
+🔐 Secure device authentication using deviceID & secretKey,
+🗄️ Sensor metrics storage with MongoDB,
+🚨 Automated alert generation (battery, temperature, humidity, offline),
+🧑‍💼 Role-based access control using JWT,
 ⚡ Device status tracking (online/offline, last seen)
 
 🛠️ Tech Stack
