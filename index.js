@@ -11,7 +11,7 @@ iotServer.use(router)
 
 require("./mqtt/mqttlistener")
 
-const PORT = 3000
+const PORT = 3000 || process.env.PORT
 
 iotServer.listen(PORT,()=>{
     console.log("Server started listening");

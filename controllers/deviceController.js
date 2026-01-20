@@ -14,7 +14,6 @@ exports.addDeviceController = async (req,res)=>{
             name,
             type,
             location,
-            // assignedUser
         })
         if (existingDevice) {
            res.status(409).json("Device already exists for this user at this location.")
