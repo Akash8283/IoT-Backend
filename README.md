@@ -24,5 +24,7 @@ MongoDB & Mongoose,
 MQTT (HiveMQ / EMQX),
 JWT Authentication
 
+Device-Simulator: https://github.com/Akash8283/IoT-Device
+
 🌐 Deployment: 
 [View on Render](https://iot-backend-2hr9.onrender.com)
